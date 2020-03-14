@@ -1,9 +1,3 @@
-// 1. Open the browser developper console on the network tab
-// 2. Start the video
-// 3. In the dev tab, locate the load of the "master.json" file, copy its full URL
-// 4. Run: node vimeo-downloader.js "<URL>"
-// 5. Combine the m4v and m4a files with mkvmerge
-
 const fs = require('fs');
 const url = require('url');
 const https = require('https');
