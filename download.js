@@ -9,7 +9,11 @@ const url = require('url');
 const https = require('https');
 // const { exec } = require("child_process");
 
-startDownloadByID(258707456,122963)
+if(process.argv.length < 3 ){
+  console.log(`Usage: node download.js {ID}(You can find ID by Browser.getCurrentVideoID.js)`);
+  return;
+}
+startDownloadByID(process.argv[2],122963)
 
 async function startDownloadByID(vID,appID) {
   try {
