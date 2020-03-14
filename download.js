@@ -15,7 +15,9 @@ startDownloadByID(id, 122963)
 
 async function startDownloadByID(vID, appID) {
     try {
-        var masterUrl = await getVimeoPageByID(vID, appID)
+        var pageData = await getVimeoPageByID(vID, appID)
+        var masterUrl = pageData.masterUrl;
+        var courseTitle = pageData.title;
     } catch (e) {
         console.log('Error On video:' + vID);
         console.error(e);
@@ -39,12 +41,12 @@ async function startDownloadByID(vID, appID) {
         const videoBaseUrl = url.resolve(url.resolve(masterUrl, json.base_url), videoData.base_url);
         const audioBaseUrl = url.resolve(url.resolve(masterUrl, json.base_url), audioData.base_url);
 
-        processFile('video', videoBaseUrl, videoData.init_segment, videoData.segments, json.clip_id + '.m4v', (err) => {
+        processFile('video', videoBaseUrl, videoData.init_segment, videoData.segments, (courseTitle || json.clip_id) + '.m4v', (err) => {
             if (err) {
                 throw err;
             }
 
-            processFile('audio', audioBaseUrl, audioData.init_segment, audioData.segments, json.clip_id + '.m4a', (err) => {
+            processFile('audio', audioBaseUrl, audioData.init_segment, audioData.segments, (courseTitle || json.clip_id) + '.m4a', (err) => {
                 if (err) {
                     throw err;
                 }
@@ -65,7 +67,10 @@ async function getVimeoPageByID(id, appID) {
                 body += data;
             });
             res.on("end", () => {
-                resolve(findJsonUrl(body));
+                resolve({
+                    masterUrl: findJsonUrl(body),
+                    title: findTitle(body)
+                });
             });
             res.on('error', (e) => {
                 reject(e)
@@ -87,6 +92,16 @@ function findJsonUrl(str) {
         }
     }
     return '';
+}
+
+function findTitle(str) {
+    const VIMEO_NAME = "on Vimeo"
+    let title = str.match(/<title.*?>(.*)<\/title>/)[1];
+    if (title) {
+        return title.split(VIMEO_NAME)[0].trim();
+    } else {
+        return null;
+    }
 }
 
 function processFile(type, baseUrl, initData, segments, filename, cb) {
