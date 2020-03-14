@@ -4,10 +4,14 @@ const https = require('https');
 // const { exec } = require("child_process");
 
 if(process.argv.length < 3 ){
-  console.log(`Usage: node download.js {ID}(You can find ID by Browser.getCurrentVideoID.js)`);
+  console.log(`Usage: node download.js {Video LINK}(You can find Video LINK by Browser.getCurrentVideoID.js)`);
   return;
 }
-startDownloadByID(process.argv[2],122963)
+let id = process.argv[2];
+id = id.replace('https://player.vimeo.com/video/','').replace('?','').replace('autoplay=1','').replace(/[&?]/gm,'').replace(/app_id=(.*)/gm,'');
+
+// Default APP ID is 122963
+startDownloadByID(id,122963)
 
 async function startDownloadByID(vID,appID) {
   try {
